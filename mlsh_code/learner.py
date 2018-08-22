@@ -113,7 +113,6 @@ class Learner:
         listoflrpairs = MPI.COMM_WORLD.allgather(lrlocal) # list of tuples
         lens, rews = map(flatten_lists, zip(*listoflrpairs))
         logger.record_tabular("EpRewMean", np.mean(rews))
-
         return np.mean(rews), np.mean(seg["ep_rets"])
 
     def updateSubPolicies(self, test_segs, num_batches, optimize=True):

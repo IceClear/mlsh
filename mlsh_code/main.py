@@ -136,7 +136,7 @@ def train():
     comm.Barrier()
     # comm = MPI.COMM_WORLD
 
-    master.start(callback, args=args, workerseed=workerseed, rank=rank, comm=comm)
+    master.start(callback, args=args, workerseed=workerseed, rank=rank, comm=comm, logdir=args.save_dir)
 
 def main():
     if MPI.COMM_WORLD.Get_rank() == 0 and osp.exists(LOGDIR):
