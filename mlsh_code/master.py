@@ -57,11 +57,11 @@ def start(callback, args, workerseed, rank, comm):
         policy.reset()
         learner.syncMasterPolicies()
 
-        # env.env.randomizeCorrect()
+        env.randomizeCorrect() # change goal in this function, do not change goal in reset, make sure the logic of done-reset is correct
         # shared_goal = comm.bcast(env.env.realgoal, root=0)
         # env.env.realgoal = shared_goal
 
-        # print("It is iteration %d so i'm changing the goal to %s" % (x, env.env.realgoal))
+        print("It is iteration %d so i'm changing the goal to %s" % (x, env.realgoal))
         mini_ep = 0 if x > 0 else -1 * (rank % 10)*int(warmup_time+train_time / 10)
         # mini_ep = 0
 

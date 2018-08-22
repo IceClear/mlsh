@@ -101,7 +101,7 @@ class Learner:
         d = Dataset(dict(ob=ob, ac=ac, atarg=atarg, vtarg=tdlamret), shuffle=True)
         optim_batchsize = min(self.optim_batchsize,ob.shape[0])
 
-        self.policy.ob_rms.update(ob) # update running mean/std for policy
+        # self.policy.ob_rms.update(ob) # update running mean/std for policy
 
         self.assign_old_eq_new()
         for _ in range(self.optim_epochs):
@@ -131,7 +131,7 @@ class Learner:
             self.assign_subs[i]() # set old parameter values to new parameter values
             # Here we do a bunch of optimization epochs over the data
             if self.optim_batchsize > 0 and is_optimizing and optimize:
-                self.sub_policies[i].ob_rms.update(ob)
+                # self.sub_policies[i].ob_rms.update(ob)
                 for k in range(self.optim_epochs):
                     m = 0
                     for test_batch in test_d.iterate_times(test_batchsize, num_batches):
@@ -139,7 +139,7 @@ class Learner:
                         self.adams[i].update(test_g, self.optim_stepsize, 1)
                         m += 1
             else:
-                self.sub_policies[i].ob_rms.noupdate()
+                # self.sub_policies[i].ob_rms.noupdate()
                 blank = self.zerograd()
                 for _ in range(self.optim_epochs):
                     for _ in range(num_batches):

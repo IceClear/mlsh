@@ -473,6 +473,56 @@ class OverCooked(gym.Env):
         self.goal_id = 0
         self.eposide_length = 0
         self.action_mem = np.zeros(self.leg_num)
+        # self.realgoal = np.arange(1,self.goal_num+1)
+        self.cur_goal = np.zeros(self.goal_num)
+        self.goal_ram = np.zeros(self.goal_num)
+        self.leg_move_count = 0
+        self.color_area = []
+        # self.action_count = np.zeros(4)
+        self.leg_count = np.zeros(self.leg_num*4+1)
+
+        # if self.args.reward_level == 1:
+        #     self.single_goal = np.random.randint(0,self.goal_num)
+        #     self.goal_label = np.zeros(4)
+        #     self.goal_label[0] = self.single_goal+1
+        # elif self.args.reward_level == 0:
+        #     self.single_goal = 1
+
+        self.position = [self.screen_width/2-self.screen_width/20, self.screen_height/2-self.screen_height/20]
+        self.state = np.zeros((self.leg_num,2))
+        self.leg_position = []
+        self.leg_position.append(np.array([self.position[0]-self.leg_size, self.position[1]-self.leg_size]))
+        self.leg_position.append(np.array([self.position[0]-self.leg_size, self.position[1]+self.screen_height/10]))
+        self.leg_position.append(np.array([self.position[0]+self.screen_width/10, self.position[1]-self.leg_size]))
+        self.leg_position.append(np.array([self.position[0]+self.screen_width/10, self.position[1]+self.screen_height/10]))
+
+        self.reset_legposi = []
+        self.reset_legposi.append(
+            np.array([self.position[0] - self.leg_size, self.position[1] - self.leg_size]))
+        self.reset_legposi.append(
+            np.array([self.position[0] - self.leg_size, self.position[1] + self.screen_height / 10]))
+        self.reset_legposi.append(
+            np.array([self.position[0] + self.screen_width / 10, self.position[1] - self.leg_size]))
+        self.reset_legposi.append(
+            np.array([self.position[0] + self.screen_width / 10, self.position[1] + self.screen_height / 10]))
+
+        self.canvas_clear()
+
+        # np.random.shuffle(self.realgoal)
+        self.setgoal()
+
+        # if self.args.reward_level == 2:
+        #     self.show_next_goal(self.realgoal[0])
+
+        obs = self.obs()
+
+        return obs
+
+    def randomizeCorrect(self):
+        self.leg_id = 0
+        self.goal_id = 0
+        self.eposide_length = 0
+        self.action_mem = np.zeros(self.leg_num)
         self.realgoal = np.arange(1,self.goal_num+1)
         self.cur_goal = np.zeros(self.goal_num)
         self.goal_ram = np.zeros(self.goal_num)
@@ -514,9 +564,7 @@ class OverCooked(gym.Env):
         if self.args.reward_level == 2:
             self.show_next_goal(self.realgoal[0])
 
-        obs = self.obs()
 
-        return obs
 
     def reset_after_goal(self):
         self.action_mem = np.zeros(self.leg_num)
@@ -628,7 +676,7 @@ class OverCooked(gym.Env):
 
 if __name__ == '__main__':
     from visdom import Visdom
-    from arguments import get_args
+    from args_overcooked import get_args
     viz = Visdom()
     win = None
     win_dic = {}
@@ -637,7 +685,10 @@ if __name__ == '__main__':
 
     env = OverCooked(args)
     for i_episode in range(20):
-        observation = env.reset()
+        if i_episode%2 == 1:
+            observation = env.reset()
+        else:
+            observation = env.randomizeCorrect()
         for t in range(100):
             # env.render(True)
             key = env.get_keys_to_action()

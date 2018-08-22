@@ -17,8 +17,8 @@ class SubPolicy(object):
 
             with tf.variable_scope("obfilter"):
                 self.ob_rms = RunningMeanStd(shape=(ob.get_shape()[1],))
-            obz = tf.clip_by_value((ob - self.ob_rms.mean) / self.ob_rms.std, -5.0, 5.0)
-            # obz = ob
+            # obz = tf.clip_by_value((ob - self.ob_rms.mean) / self.ob_rms.std, -5.0, 5.0)
+            obz = ob/255.0
 
             # value function
             last_out = obz
