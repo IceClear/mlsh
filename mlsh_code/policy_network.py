@@ -15,23 +15,31 @@ class Policy(object):
         self.gaussian_fixed_var = gaussian_fixed_var
         self.num_subpolicies = num_subpolicies
 
+
         with tf.variable_scope(name):
             self.scope = tf.get_variable_scope().name
             with tf.variable_scope("obfilter"):
                 self.ob_rms = RunningMeanStd(shape=(ob.get_shape()[1],))
             obz = tf.clip_by_value((ob - self.ob_rms.mean) / self.ob_rms.std, -5.0, 5.0)
             # obz = ob
-
             # value function
             last_out = obz
-            for i in range(num_hid_layers):
-                last_out = tf.nn.tanh(U.dense(last_out, hid_size, "vffc%i"%(i+1), weight_init=U.normc_initializer(1.0)))
+            # for i in range(num_hid_layers):
+            #     last_out = tf.nn.tanh(U.dense(last_out, hid_size, "vffc%i"%(i+1), weight_init=U.normc_initializer(1.0)))
+
+            '''Conv2d'''
+            last_out = tf.nn.relu(U.conv2d(last_out, 32, "l1", [8, 8], [4, 4], pad="VALID"))
+            last_out = tf.nn.relu(U.conv2d(last_out, 64, "l2", [4, 4], [2, 2], pad="VALID"))
+            last_out = tf.nn.relu(U.conv2d(last_out, 32, "l3", [3, 3], [1, 1], pad="VALID"))
+            last_out = U.flattenallbut0(last_out)
+            last_out = tf.nn.relu(tf.layers.dense(last_out, 512, name='lin', kernel_initializer=U.normc_initializer(1.0)))
+
             self.vpred = U.dense(last_out, 1, "vffinal", weight_init=U.normc_initializer(1.0))[:,0]
 
             # master policy
-            last_out = obz
-            for i in range(num_hid_layers):
-                last_out = tf.nn.tanh(U.dense(last_out, hid_size, "masterpol%i"%(i+1), weight_init=U.normc_initializer(1.0)))
+            # last_out = obz
+            # for i in range(num_hid_layers):
+            #     last_out = tf.nn.tanh(U.dense(last_out, hid_size, "masterpol%i"%(i+1), weight_init=U.normc_initializer(1.0)))
             self.selector = U.dense(last_out, num_subpolicies, "masterpol_final", U.normc_initializer(0.01))
             self.pdtype = pdtype = CategoricalPdType(num_subpolicies)
             self.pd = pdtype.pdfromflat(self.selector)

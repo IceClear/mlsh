@@ -12,7 +12,13 @@ import numpy as np
 import pickle
 
 def start(callback, args, workerseed, rank, comm):
-    env = gym.make(args.task)
+    if args.task in ['OverCooked']:
+        import overcooked
+        env = overcooked.OverCooked(
+            args = args,
+        )
+    else:
+        env = gym.make(args.task)
     env.seed(workerseed)
     np.random.seed(workerseed)
     ob_space = env.observation_space
@@ -24,10 +30,10 @@ def start(callback, args, workerseed, rank, comm):
     warmup_time = args.warmup_time
     train_time = args.train_time
 
-    num_batches = 15
 
+    num_batches = 15
     # observation in.
-    ob = U.get_placeholder(name="ob", dtype=tf.float32, shape=[None, ob_space.shape[0]])
+    ob = U.get_placeholder(name="ob", dtype=tf.float32, shape=[None]+list(ob_space.shape))
     # ob = U.get_placeholder(name="ob", dtype=tf.float32, shape=[None, 104])
 
     # features = Features(name="features", ob=ob)
@@ -51,16 +57,17 @@ def start(callback, args, workerseed, rank, comm):
         policy.reset()
         learner.syncMasterPolicies()
 
-        env.env.randomizeCorrect()
-        shared_goal = comm.bcast(env.env.realgoal, root=0)
-        env.env.realgoal = shared_goal
+        # env.env.randomizeCorrect()
+        # shared_goal = comm.bcast(env.env.realgoal, root=0)
+        # env.env.realgoal = shared_goal
 
-        print("It is iteration %d so i'm changing the goal to %s" % (x, env.env.realgoal))
+        # print("It is iteration %d so i'm changing the goal to %s" % (x, env.env.realgoal))
         mini_ep = 0 if x > 0 else -1 * (rank % 10)*int(warmup_time+train_time / 10)
         # mini_ep = 0
 
         totalmeans = []
         while mini_ep < warmup_time+train_time:
+
             mini_ep += 1
             # rollout
             rolls = rollout.__next__()
