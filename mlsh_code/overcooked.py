@@ -37,8 +37,9 @@ class OverCooked(gym.Env):
         self.info = {}
         self.color_area = []
 
+        discount = 3
         '''move distance: screen_width/move_discount, default:10---3 step'''
-        self.move_discount = 10/3
+        self.move_discount = 10/discount
         '''body thickness, default -- 2, -1 means solid'''
         self.body_thickness = -1
         '''leg size, default -- self.screen_width/20'''
@@ -56,20 +57,20 @@ class OverCooked(gym.Env):
         if self.args.reward_level in [0]:
             self.episode_length_limit = 5
         elif self.args.reward_level in [1]:
-            self.episode_length_limit = 4*6*2
+            self.episode_length_limit = int((4*6*2)/discount)
         elif self.args.reward_level in [2]:
             if self.goal_num in [4]:
                 # get 4 food in sequence
-                self.episode_length_limit = 6+12+6+12
+                self.episode_length_limit = int((6+12+6+120)/discount)
             elif self.goal_num in [3]:
                 # get 3 food in sequence
-                self.episode_length_limit = 6+12+6
+                self.episode_length_limit = int((6+12+6)/discount)
             elif self.goal_num in [2]:
                 # get 2 food in sequence
-                self.episode_length_limit = 6+12
+                self.episode_length_limit = int((6+12)/discount)
             elif self.goal_num in [1]:
                 # get 1 food in sequence
-                self.episode_length_limit = 6
+                self.episode_length_limit = int(6/discount)
             else:
                 raise NotImplementedError
             self.episode_length_limit = self.episode_length_limit*4*2
