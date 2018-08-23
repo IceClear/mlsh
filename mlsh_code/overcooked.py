@@ -61,7 +61,7 @@ class OverCooked(gym.Env):
         elif self.args.reward_level in [2]:
             if self.goal_num in [4]:
                 # get 4 food in sequence
-                self.episode_length_limit = int((6+12+6+120)/discount)
+                self.episode_length_limit = int((6+12+6+12)/discount)
             elif self.goal_num in [3]:
                 # get 3 food in sequence
                 self.episode_length_limit = int((6+12+6)/discount)

@@ -17,7 +17,7 @@ pip install -e .
 
 ##### Running Experiments
 ```
-python main.py --task OverCooked --num_subs 2 --macro_duration 1000 --num_rollouts 2000 --warmup_time 20 --train_time 30 --replay False --exp two_sequence --obs-type 'image' --env-name "OverCooked" --reward-level 2 --log-behavior-interval 5
+python main.py --task OverCooked --num_subs 5 --macro_duration 4 --num_rollouts 16 --warmup_time 9 --train_time 1 --replay False --exp mlsh --obs-type 'image' --env-name "OverCooked" --reward-level 1 --log-behavior-interval 5
 
 ```
 Once you've trained your agent, view it by running:
